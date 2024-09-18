@@ -10,7 +10,7 @@ const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';  // Replace with y
 // Initialize the Frog app with Neynar middleware
 export const app = new Frog({
   basePath: '/api',
-  imageOptions: { width: 1200, height: 630 },
+  imageOptions: { width: 1200, height: 630 },  // Set image dimensions here
   title: '$MOXIE Earnings Tracker',
 }).use(
   neynar({
