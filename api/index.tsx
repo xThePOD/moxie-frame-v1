@@ -17,6 +17,7 @@ export const app = new Frog({
   })
 );
 
+// Airstack API Response Interface
 interface AirstackApiResponse {
   data: {
     todayEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
@@ -25,23 +26,25 @@ interface AirstackApiResponse {
   errors?: Array<{ message: string }>;
 }
 
+// User Info Interface
 interface MoxieUserInfo {
   todayEarnings: string;
   lifetimeEarnings: string;
 }
 
+// Fetch Moxie User Info from API
 async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   const query = `
     query MoxieEarnings($fid: String!) {
       todayEarnings: FarcasterMoxieEarningStats(
-        input: {timeframe: TODAY, blockchain: ALL, filter: {entityType: {_eq: USER}, entityId: {_eq: $fid}}}
+        input: { timeframe: TODAY, blockchain: ALL, filter: { entityType: {_eq: USER}, entityId: {_eq: $fid}} }
       ) {
         FarcasterMoxieEarningStat {
           allEarningsAmount
         }
       }
       lifetimeEarnings: FarcasterMoxieEarningStats(
-        input: {timeframe: LIFETIME, blockchain: ALL, filter: {entityType: {_eq: USER}, entityId: {_eq: $fid}}}
+        input: { timeframe: LIFETIME, blockchain: ALL, filter: { entityType: {_eq: USER}, entityId: {_eq: $fid}} }
       ) {
         FarcasterMoxieEarningStat {
           allEarningsAmount
@@ -49,7 +52,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       }
     }
   `;
-
+  
   const variables = { fid };
 
   try {
@@ -57,7 +60,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,
+        Authorization: `Bearer ${AIRSTACK_API_KEY}`,
       },
       body: JSON.stringify({ query, variables }),
     });
@@ -85,7 +88,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   }
 }
 
-// First frame: Home screen
+// First Frame: Home Screen
 app.frame('/', (c) => {
   return c.res({
     image: (
@@ -100,7 +103,7 @@ app.frame('/', (c) => {
   });
 });
 
-// Second frame: Stats display with reset functionality
+// Second Frame: Moxie Stats Display
 app.frame('/check', async (c) => {
   const { fid } = c.frameData || {};
 
@@ -126,8 +129,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        // Reset button: Manually reset and navigate back to frame 1
-        <Button action="/" value="reset">Reset</Button>
+        // Reset button returns to first frame without clearing frame data unnecessarily
+        <Button action="/" value="reset_moxie">Reset</Button>
       ],
     });
   } catch (error) {
@@ -142,6 +145,6 @@ app.frame('/check', async (c) => {
   }
 });
 
-// Handle GET and POST requests //
+// Handle GET and POST requests
 export const GET = handle(app);
 export const POST = handle(app);
