@@ -100,7 +100,7 @@ app.frame('/', (c) => {
   });
 });
 
-// Second frame: Stats display with reset functionality on "Back"
+// Second frame: Stats display with reset functionality on "Reset"
 app.frame('/check', async (c) => {
   const { fid } = c.frameData || {};
 
@@ -126,7 +126,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Back</Button> // This navigates the user back to the first frame.
+        // "Reset" Button to reset and go back to the first frame
+        <Button action="/" value="reset">Reset</Button>
       ],
     });
   } catch (error) {
