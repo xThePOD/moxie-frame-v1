@@ -90,8 +90,8 @@ app.frame('/', (c) => {
   return c.res({
     image: (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: 'black', color: 'white' }}>
-        <h1 style={{ fontSize: '48px' }}>MOXIE</h1>
-        <p style={{ fontSize: '24px' }}>Check your Moxie earnings</p>
+        <h1 style={{ fontSize: '48px', fontWeight: 'bold' }}>MOXIE</h1>
+        <p style={{ fontSize: '27px', fontWeight: 'bold' }}>Check your Moxie earnings</p>
       </div>
     ),
     intents: [
@@ -100,7 +100,7 @@ app.frame('/', (c) => {
   });
 });
 
-// Second frame: Stats display
+// Second frame: Stats display with reset functionality on "Back"
 app.frame('/check', async (c) => {
   const { fid } = c.frameData || {};
 
@@ -108,7 +108,7 @@ app.frame('/check', async (c) => {
     return c.res({
       image: (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
-          <h1 style={{ fontSize: '36px' }}>Error: No FID provided</h1>
+          <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: No FID provided</h1>
         </div>
       ),
     });
@@ -120,9 +120,9 @@ app.frame('/check', async (c) => {
     return c.res({
       image: (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#7b2cbf', color: 'white' }}>
-          <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>Moxie Stats</h1>
-          <p style={{ fontSize: '36px' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
-          <p style={{ fontSize: '36px' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+          <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
+          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
+          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
         </div>
       ),
       intents: [
@@ -133,8 +133,8 @@ app.frame('/check', async (c) => {
     return c.res({
       image: (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
-          <h1 style={{ fontSize: '36px' }}>Error fetching data</h1>
-          <p style={{ fontSize: '24px' }}>{(error as Error).message}</p>
+          <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error fetching data</h1>
+          <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
       ),
     });
