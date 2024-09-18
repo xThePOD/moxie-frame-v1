@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';  // Replace with your actual Airstack API Key
 
 export const app = new Frog({
   basePath: '/api',
@@ -12,7 +12,7 @@ export const app = new Frog({
   title: '$MOXIE Earnings Tracker',
 }).use(
   neynar({
-    apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',
+    apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',  // Replace with your Neynar API Key
     features: ['interactor', 'cast'],
   })
 );
@@ -30,6 +30,7 @@ interface MoxieUserInfo {
   lifetimeEarnings: string;
 }
 
+// Function to fetch Moxie earnings from Airstack based on FID
 async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   const query = `
     query MoxieEarnings($fid: String!) {
@@ -85,28 +86,30 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   }
 }
 
+// First frame: Welcome Screen with a Button to Check Moxie Stats
 app.frame('/', (c) => {
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: 'black', color: 'white' }}>
-        <h1 style={{ fontSize: '48px' }}>MOXIE</h1>
-        <p style={{ fontSize: '24px' }}>Check your Moxie earnings</p>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
+        <h1 style={{ color: 'white', fontSize: '48px' }}>MOXIE</h1>
+        <p style={{ color: 'white', fontSize: '24px' }}>Check your Moxie earnings</p>
       </div>
     ),
     intents: [
-      <Button value="check_moxie_stats">Check Moxie Stats</Button>
+      <Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>
     ],
   });
 });
 
+// Second frame: Display Moxie Earnings
 app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};
+  const { fid } = c.frameData || {};  // Neynar provides FID here
 
   if (!fid) {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
-          <h1 style={{ fontSize: '36px' }}>Error: No FID provided</h1>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa' }}>
+          <h1 style={{ fontSize: '36px', color: 'black' }}>Error: No FID provided</h1>
         </div>
       ),
     });
@@ -116,24 +119,28 @@ app.frame('/check', async (c) => {
     const userInfo = await getMoxieUserInfo(fid.toString());
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: 'black', color: 'white' }}>
-          <h1 style={{ fontSize: '36px' }}>Moxie Stats</h1>
-          <p style={{ fontSize: '24px' }}>Today's Earnings: {userInfo.todayEarnings} MOX</p>
-          <p style={{ fontSize: '24px' }}>Lifetime Earnings: {userInfo.lifetimeEarnings} MOX</p>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
+          <h1 style={{ color: 'white', fontSize: '36px' }}>Moxie Stats</h1>
+          <p style={{ color: 'white', fontSize: '24px' }}>Today’s Earnings: {userInfo.todayEarnings} MOX</p>
+          <p style={{ color: 'white', fontSize: '24px' }}>Lifetime Earnings: {userInfo.lifetimeEarnings} MOX</p>
         </div>
       ),
+      intents: [
+        <Button action="/">Back</Button>,
+      ]
     });
   } catch (error) {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
-          <h1 style={{ fontSize: '36px' }}>Error fetching data</h1>
-          <p style={{ fontSize: '24px' }}>{(error as Error).message}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0e6fa' }}>
+          <h1 style={{ fontSize: '36px', color: 'black' }}>Error fetching data</h1>
+          <p style={{ fontSize: '24px', color: 'black' }}>{(error as Error).message}</p>
         </div>
       ),
     });
   }
 });
 
+// Handle GET and POST requests
 export const GET = handle(app);
 export const POST = handle(app);
