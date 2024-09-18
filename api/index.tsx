@@ -1,137 +1,162 @@
-import { Button, Frog } from 'frog';
-import { devtools } from 'frog/dev';
-import { serveStatic } from 'frog/serve-static';
+import { Frog } from 'frog';
 import { handle } from 'frog/vercel';
+import fetch from 'node-fetch';
+import { neynar } from 'frog/middlewares';
 
-// Hardcode your API key here (Make sure to replace with the actual API key)
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
+// Define the Airstack API URL and your actual API key
+const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Update this with your real API key
 
-// Query to fetch Moxie earnings stats for users
-async function fetchMoxieEarningStats(): Promise<any> {
+// Initialize the Frog app and use Neynar for Farcaster FID and Wallet integration
+export const app = new Frog({
+  basePath: '/api',
+  imageOptions: { width: 1200, height: 630 },
+  title: '$MOXIE Earnings Tracker',
+}).use(
+  neynar({
+    apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',  // Your Neynar API Key for Farcaster integration
+    features: ['interactor', 'cast'],
+  })
+);
+
+// Define the types for the response data
+interface AirstackApiResponse {
+  data: {
+    todayEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
+    lifetimeEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
+  };
+  errors?: Array<{ message: string }>;
+}
+
+// Moxie User Info interface
+interface MoxieUserInfo {
+  todayEarnings: string;
+  lifetimeEarnings: string;
+}
+
+// Function to get Moxie earnings for a specific FID
+async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   const query = `
-    query RewardUsersForFrameInteraction {
-      FarcasterMoxieEarningStats(
-        input: {timeframe: TODAY, blockchain: ALL, filter: {entityType: {_eq: USER}}}
+    query MoxieEarnings($fid: String!) {
+      todayEarnings: FarcasterMoxieEarningStats(
+        input: {timeframe: TODAY, blockchain: ALL, filter: {entityType: {_eq: USER}, entityId: {_eq: $fid}}}
       ) {
         FarcasterMoxieEarningStat {
-          entityId
-          entityType
           allEarningsAmount
-          castEarningsAmount
-          frameDevEarningsAmount
-          otherEarningsAmount
-          timeframe
-          socials {
-            profileName
-            userId
-            userAddress
-          }
+        }
+      }
+      lifetimeEarnings: FarcasterMoxieEarningStats(
+        input: {timeframe: LIFETIME, blockchain: ALL, filter: {entityType: {_eq: USER}, entityId: {_eq: $fid}}}
+      ) {
+        FarcasterMoxieEarningStat {
+          allEarningsAmount
         }
       }
     }
   `;
 
+  const variables = { fid };
+
   try {
-    console.log('Fetching Moxie earning stats...');
-    const response = await fetch('https://api.airstack.xyz/graphql', {
+    const response = await fetch(AIRSTACK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,
+        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,  // Ensure this key is correct
       },
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query, variables }),
     });
 
     if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`API Error: ${response.status}`);
     }
 
-    const result = await response.json();
-    
-    if (result.errors) {
-      console.error('Airstack API errors:', result.errors);
-      return null;
+    const data: AirstackApiResponse = await response.json();
+
+    if (data.errors) {
+      throw new Error('Error in GraphQL query: ' + data.errors[0].message);
     }
 
-    console.log('Moxie earning stats fetched successfully');
-    return result.data.FarcasterMoxieEarningStats.FarcasterMoxieEarningStat;
+    const todayEarnings = data.data.todayEarnings?.FarcasterMoxieEarningStat?.[0]?.allEarningsAmount || '0';
+    const lifetimeEarnings = data.data.lifetimeEarnings?.FarcasterMoxieEarningStat?.[0]?.allEarningsAmount || '0';
+
+    return {
+      todayEarnings,
+      lifetimeEarnings,
+    };
   } catch (error) {
-    console.error('Error fetching Moxie earning stats:', error);
-    return null;
+    console.error('Error fetching Moxie data:', error);
+    throw error;
   }
 }
 
-// Initialize the Frog app
-export const app = new Frog({
-  assetsPath: '/',
-  basePath: '/api',
-  title: 'Moxie Frame',
-});
-
-// First frame displaying 'MOXIE' with a button to proceed
-app.frame('/', (c) => {
-  return c.res({
-    image: (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#000000' }}>
-        <h1 style={{ color: 'white', fontSize: '48px', fontWeight: 'bold' }}>MOXIE</h1>
-      </div>
-    ),
-    intents: [<Button action="/moxie-stats">Check Moxie Stats</Button>],
+// Frame 1: Welcome frame that shows "MOXIE" with a button to check stats
+app.frame('/', () => {
+  return new Response(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>$MOXIE Earnings Tracker</title>
+      <meta property="fc:frame" content="vNext">
+    </head>
+    <body style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: black;">
+      <h1 style="color: white; font-size: 48px;">MOXIE</h1>
+      <form method="post" action="/api/check">
+        <button type="submit" style="font-size: 24px; margin-top: 20px;">Check Moxie Stats</button>
+      </form>
+    </body>
+    </html>`, {
+    headers: { 'Content-Type': 'text/html' },
   });
 });
 
-// Second frame displaying 'Moxie Earnings Results'
-app.frame('/moxie-stats', async (c) => {
-  console.log('Entering /moxie-stats frame');
-  let content;
-  try {
-    const moxieEarnings = await fetchMoxieEarningStats();
-
-    if (!moxieEarnings || moxieEarnings.length === 0) {
-      console.log('No Moxie earnings data available');
-      content = (
-        <p style={{ color: 'white', fontSize: '24px' }}>No Moxie earnings data available at the moment.</p>
-      );
-    } else {
-      console.log('Moxie earnings data received:', moxieEarnings);
-      content = moxieEarnings.map((stat: any, index: number) => (
-        <p key={index} style={{ color: 'white', fontSize: '20px', margin: '5px 0' }}>
-          {`${stat.socials?.profileName || 'Unknown'} earned ${stat.allEarningsAmount || '0'} MOX`}
-        </p>
-      ));
-    }
-  } catch (error) {
-    console.error('Error in /moxie-stats frame:', error);
-    content = (
-      <p style={{ color: 'white', fontSize: '24px' }}>Error fetching Moxie earnings data. Please try again.</p>
-    );
+// Frame 2: Shows Moxie earnings after checking stats
+app.frame('/check', async (c) => {
+  const { fid } = c.frameData || {};  // Extract FID from frameData
+  if (!fid) {
+    return c.res({
+      image: (
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; background-color: #f0e6fa;">
+          <h1 style="font-size: 36px; color: black;">Error: No FID provided</h1>
+          <form method="post" action="/">
+            <button type="submit" style="font-size: 24px;">Go Back</button>
+          </form>
+        </div>
+      ),
+    });
   }
 
-  console.log('Rendering /moxie-stats frame');
-  return c.res({
-    image: (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%', background: '#000000', padding: '20px' }}>
-        <h1 style={{ color: 'white', fontSize: '36px', marginBottom: '20px' }}>Moxie Earnings</h1>
-        <div style={{ overflowY: 'auto', maxHeight: '70%' }}>
-          {content}
+  try {
+    const userInfo = await getMoxieUserInfo(fid.toString());
+
+    return c.res({
+      image: (
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: black;">
+          <h1 style="color: white; font-size: 36px;">Moxie Stats</h1>
+          <p style="color: white; font-size: 24px;">Today’s Earnings: {userInfo.todayEarnings} MOX</p>
+          <p style="color: white; font-size: 24px;">Lifetime Earnings: {userInfo.lifetimeEarnings} MOX</p>
+          <form method="post" action="/">
+            <button type="submit" style="font-size: 24px; margin-top: 20px;">Back</button>
+          </form>
         </div>
-      </div>
-    ),
-    intents: [<Button action="/">Back to Home</Button>],
-  });
+      ),
+    });
+  } catch (error) {
+    return c.res({
+      image: (
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: #f0e6fa;">
+          <h1 style="color: black; font-size: 36px;">Error fetching data</h1>
+          <form method="post" action="/">
+            <button type="submit" style="font-size: 24px;">Go Back</button>
+          </form>
+        </div>
+      ),
+    });
+  }
 });
 
-// Edge runtime configuration for Vercel
-export const config = {
-  runtime: 'edge',
-};
-
-// Environment detection for development vs. production
-const isProduction = process.env.NODE_ENV === 'production';
-
-// Setup devtools based on environment
-devtools(app, isProduction ? { assetsPath: '/.frog' } : { serveStatic });
-
+// Handle GET and POST requests
 export const GET = handle(app);
 export const POST = handle(app);
