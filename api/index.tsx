@@ -32,6 +32,7 @@ async function fetchMoxieEarningStats(): Promise<any> {
   `;
 
   try {
+    console.log('Fetching Moxie earning stats...');
     const response = await fetch('https://api.airstack.xyz/graphql', {
       method: 'POST',
       headers: {
@@ -41,6 +42,11 @@ async function fetchMoxieEarningStats(): Promise<any> {
       body: JSON.stringify({ query }),
     });
 
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const result = await response.json();
     
     if (result.errors) {
@@ -48,6 +54,7 @@ async function fetchMoxieEarningStats(): Promise<any> {
       return null;
     }
 
+    console.log('Moxie earning stats fetched successfully');
     return result.data.FarcasterMoxieEarningStats.FarcasterMoxieEarningStat;
   } catch (error) {
     console.error('Error fetching Moxie earning stats:', error);
@@ -76,15 +83,18 @@ app.frame('/', (c) => {
 
 // Second frame displaying 'Moxie Earnings Results'
 app.frame('/moxie-stats', async (c) => {
+  console.log('Entering /moxie-stats frame');
   let content;
   try {
     const moxieEarnings = await fetchMoxieEarningStats();
 
     if (!moxieEarnings || moxieEarnings.length === 0) {
+      console.log('No Moxie earnings data available');
       content = (
         <p style={{ color: 'white', fontSize: '24px' }}>No Moxie earnings data available at the moment.</p>
       );
     } else {
+      console.log('Moxie earnings data received:', moxieEarnings);
       content = moxieEarnings.map((stat: any, index: number) => (
         <p key={index} style={{ color: 'white', fontSize: '20px', margin: '5px 0' }}>
           {`${stat.socials?.profileName || 'Unknown'} earned ${stat.allEarningsAmount || '0'} MOX`}
@@ -98,6 +108,7 @@ app.frame('/moxie-stats', async (c) => {
     );
   }
 
+  console.log('Rendering /moxie-stats frame');
   return c.res({
     image: (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%', background: '#000000', padding: '20px' }}>
