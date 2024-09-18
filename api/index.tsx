@@ -5,9 +5,9 @@ import { neynar } from 'frog/middlewares';
 
 // Airstack API configuration
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';  // Replace this with your real API key
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';  // Replace with your real API key
 
-// Initialize the Frog app with Neynar for FID integration
+// Initialize the Frog app with Neynar middleware
 export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 630 },
