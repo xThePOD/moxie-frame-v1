@@ -142,6 +142,6 @@ app.frame('/check', async (c) => {
   }
 });
 
-// Handle GET and POST requests
+// Handle GET and POST requests //
 export const GET = handle(app);
 export const POST = handle(app);
