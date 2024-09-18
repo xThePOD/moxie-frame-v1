@@ -36,11 +36,9 @@ async function fetchMoxieEarningStats(): Promise<any> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,  // Use hardcoded API key
+        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,
       },
-      body: JSON.stringify({
-        query,
-      }),
+      body: JSON.stringify({ query }),
     });
 
     const result = await response.json();
@@ -72,36 +70,44 @@ app.frame('/', (c) => {
         <h1 style={{ color: 'white', fontSize: '48px', fontWeight: 'bold' }}>MOXIE</h1>
       </div>
     ),
-    intents: [<Button value="check_stats">Check Moxie Stats</Button>],
+    intents: [<Button action="/moxie-stats">Check Moxie Stats</Button>],
   });
 });
 
 // Second frame displaying 'Moxie Earnings Results'
 app.frame('/moxie-stats', async (c) => {
-  const moxieEarnings = await fetchMoxieEarningStats();
+  let content;
+  try {
+    const moxieEarnings = await fetchMoxieEarningStats();
 
-  if (!moxieEarnings) {
-    return c.res({
-      image: (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#000000' }}>
-          <h1 style={{ color: 'white', fontSize: '24px' }}>Unable to retrieve Moxie earnings data</h1>
-        </div>
-      ),
-    });
+    if (!moxieEarnings || moxieEarnings.length === 0) {
+      content = (
+        <p style={{ color: 'white', fontSize: '24px' }}>No Moxie earnings data available at the moment.</p>
+      );
+    } else {
+      content = moxieEarnings.map((stat: any, index: number) => (
+        <p key={index} style={{ color: 'white', fontSize: '20px', margin: '5px 0' }}>
+          {`${stat.socials?.profileName || 'Unknown'} earned ${stat.allEarningsAmount || '0'} MOX`}
+        </p>
+      ));
+    }
+  } catch (error) {
+    console.error('Error in /moxie-stats frame:', error);
+    content = (
+      <p style={{ color: 'white', fontSize: '24px' }}>Error fetching Moxie earnings data. Please try again.</p>
+    );
   }
 
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#000000' }}>
-        <h1 style={{ color: 'white', fontSize: '36px', marginBottom: '20px' }}>Moxie Results</h1>
-        {moxieEarnings.map((stat: any, index: number) => (
-          <p key={index} style={{ color: 'white', fontSize: '24px' }}>
-            {`${stat.socials.profileName} earned ${stat.allEarningsAmount} MOX`}
-          </p>
-        ))}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%', background: '#000000', padding: '20px' }}>
+        <h1 style={{ color: 'white', fontSize: '36px', marginBottom: '20px' }}>Moxie Earnings</h1>
+        <div style={{ overflowY: 'auto', maxHeight: '70%' }}>
+          {content}
+        </div>
       </div>
     ),
-    intents: [<Button.Reset>Check Again</Button.Reset>],
+    intents: [<Button action="/">Back to Home</Button>],
   });
 });
 
