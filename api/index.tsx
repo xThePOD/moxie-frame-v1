@@ -126,7 +126,7 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Back</Button>
+        <Button action="/">Back</Button> // This navigates the user back to the first frame.
       ],
     });
   } catch (error) {
