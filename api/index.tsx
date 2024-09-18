@@ -1,25 +1,25 @@
-import { Frog } from 'frog';
+import { Button, Frog } from 'frog';
 import { handle } from 'frog/vercel';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch';  // For making API requests
 import { neynar } from 'frog/middlewares';
 
-// Define the Airstack API URL and your actual API key
+// Airstack API configuration
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Update this with your real API key
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';  // Replace this with your real API key
 
-// Initialize the Frog app and use Neynar for Farcaster FID and Wallet integration
+// Initialize the Frog app with Neynar for FID integration
 export const app = new Frog({
   basePath: '/api',
   imageOptions: { width: 1200, height: 630 },
   title: '$MOXIE Earnings Tracker',
 }).use(
   neynar({
-    apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',  // Your Neynar API Key for Farcaster integration
+    apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',  // Neynar API Key for Farcaster FID integration
     features: ['interactor', 'cast'],
   })
 );
 
-// Define the types for the response data
+// Define the Airstack API response types
 interface AirstackApiResponse {
   data: {
     todayEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
@@ -34,7 +34,7 @@ interface MoxieUserInfo {
   lifetimeEarnings: string;
 }
 
-// Function to get Moxie earnings for a specific FID
+// Function to fetch Moxie earnings based on FID
 async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   const query = `
     query MoxieEarnings($fid: String!) {
@@ -62,7 +62,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,  // Ensure this key is correct
+        'Authorization': `Bearer ${AIRSTACK_API_KEY}`,
       },
       body: JSON.stringify({ query, variables }),
     });
@@ -90,71 +90,54 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   }
 }
 
-// Frame 1: Welcome frame that shows "MOXIE" with a button to check stats
-app.frame('/', () => {
-  return new Response(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>$MOXIE Earnings Tracker</title>
-      <meta property="fc:frame" content="vNext">
-    </head>
-    <body style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: black;">
-      <h1 style="color: white; font-size: 48px;">MOXIE</h1>
-      <form method="post" action="/api/check">
-        <button type="submit" style="font-size: 24px; margin-top: 20px;">Check Moxie Stats</button>
-      </form>
-    </body>
-    </html>`, {
-    headers: { 'Content-Type': 'text/html' },
+// Frame 1: Welcome Screen with a Button to Check Moxie Stats
+app.frame('/', (c) => {
+  return c.res({
+    image: (
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: black;">
+        <h1 style="color: white; font-size: 48px;">MOXIE</h1>
+      </div>
+    ),
+    intents: [
+      <Button value="check_moxie_stats">Check Moxie Stats</Button>
+    ],
   });
 });
 
-// Frame 2: Shows Moxie earnings after checking stats
-app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};  // Extract FID from frameData
+// Frame 2: Moxie Earnings Display
+app.frame('/check', (c) => {
+  const { fid } = c.frameData || {};  // Neynar usually provides FID here
+
   if (!fid) {
     return c.res({
       image: (
         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; background-color: #f0e6fa;">
           <h1 style="font-size: 36px; color: black;">Error: No FID provided</h1>
-          <form method="post" action="/">
-            <button type="submit" style="font-size: 24px;">Go Back</button>
-          </form>
         </div>
       ),
     });
   }
 
-  try {
-    const userInfo = await getMoxieUserInfo(fid.toString());
-
+  // Fetch and display Moxie earnings
+  return getMoxieUserInfo(fid.toString()).then((userInfo) => {
     return c.res({
       image: (
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: black;">
           <h1 style="color: white; font-size: 36px;">Moxie Stats</h1>
           <p style="color: white; font-size: 24px;">Today’s Earnings: {userInfo.todayEarnings} MOX</p>
           <p style="color: white; font-size: 24px;">Lifetime Earnings: {userInfo.lifetimeEarnings} MOX</p>
-          <form method="post" action="/">
-            <button type="submit" style="font-size: 24px; margin-top: 20px;">Back</button>
-          </form>
         </div>
       ),
     });
-  } catch (error) {
+  }).catch((error) => {
     return c.res({
       image: (
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background-color: #f0e6fa;">
-          <h1 style="color: black; font-size: 36px;">Error fetching data</h1>
-          <form method="post" action="/">
-            <button type="submit" style="font-size: 24px;">Go Back</button>
-          </form>
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; background-color: #f0e6fa;">
+          <h1 style="color: black; font-size: 36px;">Error fetching data: {error.message}</h1>
         </div>
       ),
     });
-  }
+  });
 });
 
 // Handle GET and POST requests
