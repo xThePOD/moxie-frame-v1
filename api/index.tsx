@@ -147,7 +147,7 @@ app.frame('/check', async (c) => {
       2
     )} MOX in total! 🚀 Check your own Moxie earnings!`;
     
-    const frameUrl = `https://moxie-frame-v1.vercel.app/${fid}`; // Update with your base URL
+    const frameUrl = `https://moxie-frame-v1.vercel.app/api/check?fid=${fid}`; // Update with your base URL
     
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
 
