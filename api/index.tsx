@@ -7,7 +7,7 @@ const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
 
 // Define your base URL here
-const BASE_URL = 'https://moxie-frame-v1.vercel.app/'; // Replace with your actual base URL
+const BASE_URL = 'https://moxie-frame-v1.vercel.app'; // Make sure this is correct
 
 export const app = new Frog({
   basePath: '/api',
@@ -126,10 +126,10 @@ app.frame('/check', async (c) => {
     // Prewritten message for Farcaster
     const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check out my Moxie earnings.`;
     
-    // Construct the frame URL
+    // Construct the frame URL with the user's earnings embedded
     const frameUrl = `${BASE_URL}/api/check?fid=${fid}`;
     
-    // Construct the Farcaster share URL with embedded earnings data
+    // Construct the Farcaster share URL
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
 
     return c.res({
