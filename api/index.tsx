@@ -121,9 +121,13 @@ app.frame('/check', async (c) => {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
     // Prewritten message for Farcaster
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
-    const frameUrl = `https://moxie-frame-v1.vercel.app/api/${fid}`;  // Example sharable URL of the frame
-    const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Here's my Moxie earnings!`;
+
+    // URL to the dynamically generated frame/image (replace with your frame logic)
+    const frameImageUrl = `https://moxie-frame-v1.vercel.app/api/${fid}/image`; 
+
+    // Embedding the image and prewritten message directly into the Farcaster post
+    const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameImageUrl)}`;
 
     return c.res({
       image: (
