@@ -98,14 +98,14 @@ app.frame('/', (c) => {
       </div>
     ),
     intents: [
-      <Button value="check_moxie_stats">Check Moxie Stats</Button>
+      <Button action="/check" value="check_moxie_stats">Check Moxie Stats</Button>
     ],
   });
 });
 
-// Second Frame: Moxie Stats Display with Cast Message
+// Second Frame: Moxie Stats Display
 app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};
+  const { fid } = c.frameData || {};  // Capture FID (user identifier) from frame data
 
   if (!fid) {
     return c.res({
@@ -118,10 +118,7 @@ app.frame('/check', async (c) => {
   }
 
   try {
-    const userInfo = await getMoxieUserInfo(fid.toString());
-
-    // Pre-composed Cast message
-    const castMessage = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! Check out your earnings too!`;
+    const userInfo = await getMoxieUserInfo(fid.toString());  // Fetch the Moxie stats from the API
 
     return c.res({
       image: (
@@ -132,8 +129,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Back</Button>,
-        <Button.Link href={`https://warpcast.com/~/compose?text=${encodeURIComponent(castMessage)}`}>Cast Earnings</Button.Link>
+        // Ensure that pressing "Back" functions properly
+        <Button action="/" value="reset_moxie">Back</Button>
       ],
     });
   } catch (error) {
