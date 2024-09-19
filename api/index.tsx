@@ -98,14 +98,14 @@ app.frame('/', (c) => {
       </div>
     ),
     intents: [
-      <Button action="/check" value="check_moxie_stats">Check Moxie Stats</Button>
+      <Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>
     ],
   });
 });
 
-// Second Frame: Moxie Stats Display
+// Second Frame: Moxie Stats Display and Sharing Feature
 app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};  // Capture FID (user identifier) from frame data
+  const { fid } = c.frameData || {};
 
   if (!fid) {
     return c.res({
@@ -118,7 +118,11 @@ app.frame('/check', async (c) => {
   }
 
   try {
-    const userInfo = await getMoxieUserInfo(fid.toString());  // Fetch the Moxie stats from the API
+    const userInfo = await getMoxieUserInfo(fid.toString());
+
+    // Pre-composed message for casting
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total. Check your Moxie stats!`;
+    const shareUrl = `https://farcaster.xyz/cast?text=${encodeURIComponent(shareText)}`;
 
     return c.res({
       image: (
@@ -129,8 +133,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        // Ensure that pressing "Back" functions properly
-        <Button action="/" value="reset_moxie">Back</Button>
+        <Button action="/">Back to Home</Button>,
+        <Button.Link href={shareUrl}>Cast This</Button.Link>
       ],
     });
   } catch (error) {
