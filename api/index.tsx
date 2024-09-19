@@ -4,10 +4,7 @@ import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
-
-// Define your base URL here
-const BASE_URL = 'https://moxie-frame-v1.vercel.app'; // Replace with your actual base URL
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Your actual API key
 
 export const app = new Frog({
   basePath: '/api',
@@ -20,16 +17,23 @@ export const app = new Frog({
   })
 );
 
-// Airstack API Response Interface
+// API Response Interfaces
 interface AirstackApiResponse {
   data: {
-    todayEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
-    lifetimeEarnings?: { FarcasterMoxieEarningStat?: Array<{ allEarningsAmount?: string }> };
+    todayEarnings?: {
+      FarcasterMoxieEarningStat?: Array<{
+        allEarningsAmount?: string;
+      }>;
+    };
+    lifetimeEarnings?: {
+      FarcasterMoxieEarningStat?: Array<{
+        allEarningsAmount?: string;
+      }>;
+    };
   };
   errors?: Array<{ message: string }>;
 }
 
-// User Info Interface
 interface MoxieUserInfo {
   todayEarnings: string;
   lifetimeEarnings: string;
@@ -55,7 +59,6 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       }
     }
   `;
-  
   const variables = { fid };
 
   try {
@@ -67,10 +70,6 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       },
       body: JSON.stringify({ query, variables }),
     });
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
 
     const data: AirstackApiResponse = await response.json();
 
@@ -91,35 +90,50 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
   }
 }
 
-// First Frame: Home Screen
+// Home Frame
 app.frame('/', (c) => {
   return c.res({
     image: (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: 'black', color: 'white' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'black',
+          color: 'white',
+        }}
+      >
         <h1 style={{ fontSize: '48px', fontWeight: 'bold' }}>MOXIE</h1>
         <p style={{ fontSize: '27px', fontWeight: 'bold' }}>Check your Moxie earnings</p>
       </div>
     ),
-    intents: [
-      <Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>
-    ],
+    intents: [<Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>],
   });
 });
 
-// Second Frame: Moxie Stats Display with Cast Button
+// Frame with Cast Button
 app.frame('/check', async (c) => {
-  console.log('frameData:', c.frameData);
-  console.log('query params:', c.req.query);
-
-  // Use either frameData or query params to fetch the fid
-  const fid = c.frameData?.fid || c.req.query('fid'); // Correct way to get query params
+  const { fid } = c.frameData || {};
 
   if (!fid) {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0e6fa',
+            color: 'black',
+          }}
+        >
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: No FID provided</h1>
-          <p style={{ fontSize: '24px' }}>Please make sure FID is passed as a query parameter.</p>
         </div>
       ),
     });
@@ -129,17 +143,28 @@ app.frame('/check', async (c) => {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
     // Prewritten message for Farcaster
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check out my Moxie earnings.`;
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(
+      2
+    )} MOX in total! 🚀 Check your own Moxie earnings!`;
     
-    // Construct the frame URL
-    const frameUrl = `${BASE_URL}/api/check?fid=${fid}`;
+    const frameUrl = `https://your-base-url.com/api/check?fid=${fid}`; // Update with your base URL
     
-    // Construct the Farcaster share URL
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
 
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#7b2cbf', color: 'white' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#7b2cbf',
+            color: 'white',
+          }}
+        >
           <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
           <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
           <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
@@ -147,13 +172,24 @@ app.frame('/check', async (c) => {
       ),
       intents: [
         <Button action="/">Back</Button>,
-        <Button.Link href={farcasterShareURL}>Cast This</Button.Link>
+        <Button.Link href={farcasterShareURL}>Cast This</Button.Link>,
       ],
     });
   } catch (error) {
     return c.res({
       image: (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0e6fa',
+            color: 'black',
+          }}
+        >
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error fetching data</h1>
           <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
