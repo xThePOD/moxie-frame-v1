@@ -103,7 +103,7 @@ app.frame('/', (c) => {
   });
 });
 
-// Second Frame: Moxie Stats Display and Sharing Feature
+// Second Frame: Moxie Stats Display with Cast Button
 app.frame('/check', async (c) => {
   const { fid } = c.frameData || {};
 
@@ -120,9 +120,10 @@ app.frame('/check', async (c) => {
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
-    // Pre-composed message for casting
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total. Check your Moxie stats!`;
-    const shareUrl = `https://farcaster.xyz/cast?text=${encodeURIComponent(shareText)}`;
+    // Prewritten message for Farcaster
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
+    const frameUrl = `https://moxie-frame-v1.vercel.app/api/${fid}`;  // Example sharable URL of the frame
+    const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
 
     return c.res({
       image: (
@@ -133,8 +134,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Back to Home</Button>,
-        <Button.Link href={shareUrl}>Cast This</Button.Link>
+        <Button action="/">Back</Button>,
+        <Button.Link href={farcasterShareURL}>Cast This</Button.Link>
       ],
     });
   } catch (error) {
