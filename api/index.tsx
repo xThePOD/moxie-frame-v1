@@ -7,7 +7,7 @@ const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
 
 // Define your base URL here
-const BASE_URL = 'https://moxie-frame-v1.vercel.app'; // Replace with your actual base URL
+const BASE_URL = 'https://moxie-frame-v1.vercel.app/api'; // Replace with your actual base URL
 
 export const app = new Frog({
   basePath: '/api',
