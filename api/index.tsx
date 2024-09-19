@@ -98,12 +98,12 @@ app.frame('/', (c) => {
       </div>
     ),
     intents: [
-      <Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>
+      <Button value="check_moxie_stats">Check Moxie Stats</Button>
     ],
   });
 });
 
-// Second Frame: Moxie Stats Display
+// Second Frame: Moxie Stats Display with Cast Message
 app.frame('/check', async (c) => {
   const { fid } = c.frameData || {};
 
@@ -120,6 +120,9 @@ app.frame('/check', async (c) => {
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
+    // Pre-composed Cast message
+    const castMessage = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! Check out your earnings too!`;
+
     return c.res({
       image: (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#7b2cbf', color: 'white' }}>
@@ -129,8 +132,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        <Button action="/">Back to Home</Button>,
-        <Button action="/check">Refresh Stats</Button>
+        <Button action="/">Back</Button>,
+        <Button.Link href={`https://warpcast.com/~/compose?text=${encodeURIComponent(castMessage)}`}>Cast Earnings</Button.Link>
       ],
     });
   } catch (error) {
@@ -141,9 +144,6 @@ app.frame('/check', async (c) => {
           <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
       ),
-      intents: [
-        <Button action="/">Back to Home</Button>
-      ],
     });
   }
 });
