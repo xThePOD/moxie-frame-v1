@@ -98,7 +98,7 @@ app.frame('/', (c) => {
       </div>
     ),
     intents: [
-      <Button value="check_moxie_stats">Check Moxie Stats</Button>
+      <Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>
     ],
   });
 });
@@ -129,8 +129,8 @@ app.frame('/check', async (c) => {
         </div>
       ),
       intents: [
-        // Reset button returns to first frame without clearing frame data unnecessarily
-        <Button action="/" value="reset_moxie">Reset</Button>
+        <Button action="/">Back to Home</Button>,
+        <Button action="/check">Refresh Stats</Button>
       ],
     });
   } catch (error) {
@@ -141,6 +141,9 @@ app.frame('/check', async (c) => {
           <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
       ),
+      intents: [
+        <Button action="/">Back to Home</Button>
+      ],
     });
   }
 });
