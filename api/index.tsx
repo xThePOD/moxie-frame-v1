@@ -7,7 +7,7 @@ const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f';
 
 // Define your base URL here
-const BASE_URL = 'https://moxie-frame-v1.vercel.app'; // Make sure this is correct
+const BASE_URL = 'https://moxie-frame-v1.vercel.app'; // Replace with your actual base URL
 
 export const app = new Frog({
   basePath: '/api',
@@ -108,13 +108,18 @@ app.frame('/', (c) => {
 
 // Second Frame: Moxie Stats Display with Cast Button
 app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};
+  console.log('frameData:', c.frameData);
+  console.log('query params:', c.req.query);
+
+  // Use either frameData or query params to fetch the fid
+  const fid = c.frameData?.fid || c.req.query('fid'); // Correct way to get query params
 
   if (!fid) {
     return c.res({
       image: (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', backgroundColor: '#f0e6fa', color: 'black' }}>
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: No FID provided</h1>
+          <p style={{ fontSize: '24px' }}>Please make sure FID is passed as a query parameter.</p>
         </div>
       ),
     });
@@ -126,7 +131,7 @@ app.frame('/check', async (c) => {
     // Prewritten message for Farcaster
     const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check out my Moxie earnings.`;
     
-    // Construct the frame URL with the user's earnings embedded
+    // Construct the frame URL
     const frameUrl = `${BASE_URL}/api/check?fid=${fid}`;
     
     // Construct the Farcaster share URL
@@ -157,6 +162,6 @@ app.frame('/check', async (c) => {
   }
 });
 
-// Handle GET and POST requests//
+// Handle GET and POST requests
 export const GET = handle(app);
 export const POST = handle(app);
