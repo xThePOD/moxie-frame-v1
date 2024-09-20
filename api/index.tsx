@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Your actual API key
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483'; // Your actual API key
 
 export const app = new Frog({
   basePath: '/api',
@@ -116,7 +116,7 @@ app.frame('/', (c) => {
 
 // Frame with Cast Button
 app.frame('/check', async (c) => {
-  const { fid } = c.frameData || {};
+  const fid = c.frameData?.fid;
 
   if (!fid) {
     return c.res({
@@ -146,10 +146,10 @@ app.frame('/check', async (c) => {
     const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(
       2
     )} MOX in total! 🚀 Check your own Moxie earnings!`;
-    
-    const frameUrl = `https://moxie-frame-v1.vercel.app/api/check?fid=${fid}`; // Update with your base URL
-    
-    const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(frameUrl)}`;
+
+    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
+
+    const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
     return c.res({
       image: (
@@ -196,6 +196,57 @@ app.frame('/check', async (c) => {
       ),
     });
   }
+});
+
+// Share Frame (Handling embedded frame sharing)
+app.frame('/share', async (c) => {
+  const query = c.req.query();
+  const fid = query['fid'];
+  const todayEarnings = query['todayEarnings'];
+  const lifetimeEarnings = query['lifetimeEarnings'];
+
+  if (!fid || !todayEarnings || !lifetimeEarnings) {
+    return c.res({
+      image: (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0e6fa',
+            color: 'black',
+          }}
+        >
+          <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: Incomplete Data</h1>
+          <p style={{ fontSize: '24px' }}>Ensure all necessary parameters are passed.</p>
+        </div>
+      ),
+    });
+  }
+
+  return c.res({
+    image: (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#7b2cbf',
+          color: 'white',
+        }}
+      >
+        <h1 style={{ fontSize: '51px', fontWeight: 'bold' }}>Shared Moxie Stats</h1>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {todayEarnings} MOX</p>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {lifetimeEarnings} MOX</p>
+      </div>
+    ),
+  });
 });
 
 // Handle GET and POST requests
