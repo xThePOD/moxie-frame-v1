@@ -30,19 +30,6 @@ interface AirstackApiResponse {
         allEarningsAmount?: string;
       }>;
     };
-    userInfo?: {
-      Wallet?: Array<{
-        socials?: Array<{
-          dappName?: string;
-          profileName?: string;
-        }>;
-      }>;
-    };
-    farScore?: {
-      Farscore?: Array<{
-        score?: number;
-      }>;
-    };
   };
   errors?: Array<{ message: string }>;
 }
@@ -50,8 +37,6 @@ interface AirstackApiResponse {
 interface MoxieUserInfo {
   todayEarnings: string;
   lifetimeEarnings: string;
-  username?: string;
-  farScore?: number;
 }
 
 // Fetch Moxie User Info from API
@@ -70,17 +55,6 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
       ) {
         FarcasterMoxieEarningStat {
           allEarningsAmount
-        }
-      }
-      userInfo: Wallet(input: {identity: $fid, blockchain: ethereum}) {
-        socials(input: {filter: {dappName: {_eq: farcaster}}}) {
-          dappName
-          profileName
-        }
-      }
-      farScore: Farscores(input: {filter: {fid: {_eq: $fid}}}) {
-        Farscore {
-          score
         }
       }
     }
@@ -105,14 +79,10 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
 
     const todayEarnings = data.data.todayEarnings?.FarcasterMoxieEarningStat?.[0]?.allEarningsAmount || '0';
     const lifetimeEarnings = data.data.lifetimeEarnings?.FarcasterMoxieEarningStat?.[0]?.allEarningsAmount || '0';
-    const username = data.data.userInfo?.Wallet?.[0]?.socials?.[0]?.profileName;
-    const farScore = data.data.farScore?.Farscore?.[0]?.score;
 
     return {
       todayEarnings,
       lifetimeEarnings,
-      username,
-      farScore,
     };
   } catch (error) {
     console.error('Error fetching Moxie data:', error);
@@ -177,7 +147,7 @@ app.frame('/check', async (c) => {
       2
     )} MOX in total! 🚀 Check your own Moxie earnings!`;
 
-    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}&username=${userInfo.username}&farScore=${userInfo.farScore}`;
+    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
 
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
@@ -234,8 +204,6 @@ app.frame('/share', async (c) => {
   const fid = query['fid'];
   const todayEarnings = query['todayEarnings'];
   const lifetimeEarnings = query['lifetimeEarnings'];
-  const username = query['username'];
-  const farScore = query['farScore'];
 
   if (!fid || !todayEarnings || !lifetimeEarnings) {
     return c.res({
@@ -259,110 +227,28 @@ app.frame('/share', async (c) => {
     });
   }
 
-  const backgroundImageUrl = 'https://bafybeic3f4uenita4argk5knvzm7xnkagqjz4beawbvnilruwoilfb7q7e.ipfs.w3s.link/Frame%2059%20(7).png';
-
   return c.res({
     image: (
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        width: '100%', 
-        height: '100%', 
-        backgroundImage: `url(${backgroundImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        position: 'relative',
-        fontFamily: 'Arial, sans-serif'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '30px',
-          left: '30px',
+      <div
+        style={{
           display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
           alignItems: 'center',
-          width: '100%'
-        }}>
-          <div style={{ marginLeft: 'auto', marginRight: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <p style={{ 
-              fontSize: '72px', 
-              color: 'black', 
-              margin: '0 0 10px 0',
-              fontWeight: 'bold'
-            }}>
-              @{username || 'Unknown'}
-            </p>
-            <p style={{ 
-              fontSize: '24px', 
-              color: 'black', 
-              margin: '0',
-              fontWeight: 'bold'
-            }}>
-              FID: {fid}
-            </p>
-            {farScore && (
-              <p style={{ 
-                fontSize: '24px', 
-                color: 'black', 
-                margin: '5px 0 0 0',
-                fontWeight: 'bold'
-              }}>
-                Farscore: {parseFloat(farScore).toFixed(2)}
-              </p>
-            )}
-          </div>
-        </div>
-        
-        <div style={{ 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          justifyContent: 'center', 
-          position: 'absolute', 
-          top: '46%', 
-          left: '50%', 
-          transform: 'translateX(-50%)',
-          width: '100%' 
-        }}>
-          <div style={{ width: '45%', textAlign: 'center', display: 'flex', flexDirection: 'column' }}>
-            <p style={{ 
-              fontSize: '28px', 
-              color: '#FFFFFF',
-              marginBottom: '10px'
-            }}>
-              Moxie earned today
-            </p>
-            <p style={{ 
-              fontSize: '46px', 
-              fontWeight: 'bold', 
-              color: '#000000',
-            }}>
-              {parseFloat(todayEarnings).toFixed(2)}
-            </p>
-          </div>
-          <div style={{ width: '45%', textAlign: 'center', display: 'flex', flexDirection: 'column' }}>
-            <p style={{ 
-              fontSize: '28px', 
-              color: '#FFFFFF',
-              marginBottom: '10px'
-            }}>
-              Moxie earned all-time
-            </p>
-            <p style={{ 
-              fontSize: '46px', 
-              fontWeight: 'bold', 
-              color: '#000000',
-            }}>
-              {parseFloat(lifetimeEarnings).toFixed(2)}
-            </p>
-          </div>
-        </div>
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#7b2cbf',
+          color: 'white',
+        }}
+      >
+        <h1 style={{ fontSize: '51px', fontWeight: 'bold' }}>Shared Moxie Stats</h1>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(todayEarnings).toFixed(2)} MOX</p>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(lifetimeEarnings).toFixed(2)} MOX</p>
       </div>
     ),
     intents: [
       <Button action="/check">Check Your Earnings</Button>
-    ]
+    ],
   });
 });
 
