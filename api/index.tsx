@@ -110,7 +110,7 @@ app.frame('/', (c) => {
         <p style={{ fontSize: '27px', fontWeight: 'bold' }}>Check your Moxie earnings</p>
       </div>
     ),
-    intents: [<Button value="check_moxie_stats" action="/check">Check Moxie Stats</Button>],
+    intents: [<Button action="/check">Check Moxie Stats</Button>],
   });
 });
 
@@ -242,10 +242,13 @@ app.frame('/share', async (c) => {
         }}
       >
         <h1 style={{ fontSize: '51px', fontWeight: 'bold' }}>Shared Moxie Stats</h1>
-        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {todayEarnings} MOX</p>
-        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {lifetimeEarnings} MOX</p>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(todayEarnings).toFixed(2)} MOX</p>
+        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(lifetimeEarnings).toFixed(2)} MOX</p>
       </div>
     ),
+    intents: [
+      <Button action="/">Check Your Earnings</Button>
+    ],
   });
 });
 
