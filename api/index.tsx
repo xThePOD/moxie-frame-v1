@@ -247,7 +247,7 @@ app.frame('/share', async (c) => {
       </div>
     ),
     intents: [
-      <Button action="/">Check Your Earnings</Button>
+      <Button action="/check">Check Your Earnings</Button>
     ],
   });
 });
