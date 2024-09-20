@@ -224,6 +224,9 @@ app.frame('/share', async (c) => {
           <p style={{ fontSize: '24px' }}>Ensure all necessary parameters are passed.</p>
         </div>
       ),
+      intents: [
+        <Button action="/check">Check Your Earnings</Button>
+      ]
     });
   }
 
