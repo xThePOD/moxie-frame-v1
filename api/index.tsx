@@ -104,7 +104,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
 // Home Frame
 app.frame('/', (c) => {
   return c.res({
-    image: 'https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmSxprHHGYVX8rVYdcF7fu7LSB6TEkRRjhxq7AMRRWVYcu',
+    image: ('https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmSxprHHGYVX8rVYdcF7fu7LSB6TEkRRjhxq7AMRRWVYcu'),
     intents: [<Button action="/check">Check Moxie Stats</Button>],
   });
 });
@@ -147,7 +147,24 @@ app.frame('/check', async (c) => {
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
     return c.res({
-      image: ('https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo'),
+      image: (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#7b2cbf',
+            color: 'white',
+          }}
+        >
+          <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
+          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
+          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+        </div>
+      ),
       intents: [
         <Button action="/">Back</Button>,
         <Button.Link href={farcasterShareURL}>Cast This</Button.Link>,
