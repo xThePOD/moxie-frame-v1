@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { neynar } from 'frog/middlewares';
 
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
-const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483'; // Your actual API key
+const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Your actual API key
 
 export const app = new Frog({
   basePath: '/api',
