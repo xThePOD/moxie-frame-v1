@@ -21,7 +21,17 @@ export const app = new Frog({
   },
   imageAspectRatio: '1.91:1',
   title: '$MOXIE Earnings',
-}).use(
+  hub: AIRSTACK_API_KEY ? {
+    apiUrl: "https://hubs.airstack.xyz/",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": AIRSTACK_API_KEY,
+      }
+    }
+  } : undefined
+});
+
+app.use(
   neynar({
     apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',
     features: ['interactor', 'cast'],
