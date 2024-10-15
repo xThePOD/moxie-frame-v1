@@ -8,8 +8,19 @@ const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483'; // Your actual API 
 
 export const app = new Frog({
   basePath: '/api',
-  imageOptions: { width: 1200, height: 630 },
-  title: '$MOXIE Earnings Tracker',
+  imageOptions: {
+    width: 1200,
+    height: 630,
+    fonts: [
+      {
+        name: 'Protest Riot',
+        source: 'google',
+        weight: 400,
+      },
+    ],
+  },
+  imageAspectRatio: '1.91:1',
+  title: '$MOXIE Earnings',
 }).use(
   neynar({
     apiKey: '63FC33FA-82AF-466A-B548-B3D906ED2314',
