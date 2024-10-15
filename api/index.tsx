@@ -145,9 +145,6 @@ app.frame('/check', async (c) => {
       image: (
         <div style={{
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
           width: '100%',
           height: '100%',
           position: 'relative',
@@ -164,16 +161,34 @@ app.frame('/check', async (c) => {
             }}
           />
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            zIndex: 1,
-            color: 'white',
+            position: 'absolute',
+            top: '10%',
+            left: '5%',
+            color: '#FF6B6B',
+            fontSize: '36px',
+            fontWeight: 'bold',
           }}>
-            <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
-            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
-            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Weekly Earnings: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX</p>
-            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+            Today: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            left: '40%',
+            color: '#4ECDC4',
+            fontSize: '36px',
+            fontWeight: 'bold',
+          }}>
+            Weekly: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            right: '5%',
+            color: '#45B7D1',
+            fontSize: '36px',
+            fontWeight: 'bold',
+          }}>
+            Lifetime: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX
           </div>
         </div>
       ),
