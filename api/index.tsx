@@ -137,6 +137,13 @@ app.frame('/check', async (c) => {
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
+    // Fetch the image and convert it to a data URI
+    const imageUrl = 'https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo';
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.buffer();
+    const base64Image = imageBuffer.toString('base64');
+    const dataUri = `data:image/jpeg;base64,${base64Image}`;
+
     const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today, ${parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX this week, and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
     const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&weeklyEarnings=${userInfo.weeklyEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
@@ -147,7 +154,7 @@ app.frame('/check', async (c) => {
           display: 'flex',
           width: '100%',
           height: '100%',
-          backgroundImage: 'url(https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo)',
+          backgroundImage: `url(${dataUri})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
