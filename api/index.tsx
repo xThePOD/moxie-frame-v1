@@ -118,18 +118,16 @@ app.frame('/check', async (c) => {
   if (!fid) {
     return c.res({
       image: (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#f0e6fa',
-            color: 'black',
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f0e6fa',
+          color: 'black',
+        }}>
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: No FID provided</h1>
         </div>
       ),
@@ -145,41 +143,33 @@ app.frame('/check', async (c) => {
 
     return c.res({
       image: (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
-            position: 'relative',
-            fontFamily: 'Protest Riot, sans-serif',
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          fontFamily: 'Protest Riot, sans-serif',
+        }}>
           <img
             src="https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo"
             alt="Moxie Stats Background"
             style={{
+              position: 'absolute',
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              position: 'absolute',
-              top: 0,
-              left: 0,
             }}
           />
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-              color: 'white',
-              zIndex: 1,
-            }}
-          >
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            zIndex: 1,
+            color: 'white',
+          }}>
             <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
             <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
             <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Weekly Earnings: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX</p>
@@ -195,18 +185,16 @@ app.frame('/check', async (c) => {
   } catch (error) {
     return c.res({
       image: (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#f0e6fa',
-            color: 'black',
-          }}
-        >
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+          backgroundColor: '#f0e6fa',
+          color: 'black',
+        }}>
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error fetching data</h1>
           <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
