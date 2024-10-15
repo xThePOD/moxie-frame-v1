@@ -48,7 +48,6 @@ interface AirstackApiResponse {
 interface MoxieUserInfo {
   todayEarnings: string;
   lifetimeEarnings: string;
-  weeklyEarnings: string;
 }
 
 // Fetch Moxie User Info from API
@@ -95,7 +94,6 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
     return {
       todayEarnings,
       lifetimeEarnings,
-      weeklyEarnings: '0', // Added weeklyEarnings property
     };
   } catch (error) {
     console.error('Error fetching Moxie data:', error);
@@ -118,16 +116,18 @@ app.frame('/check', async (c) => {
   if (!fid) {
     return c.res({
       image: (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#f0e6fa',
-          color: 'black',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0e6fa',
+            color: 'black',
+          }}
+        >
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error: No FID provided</h1>
         </div>
       ),
@@ -137,57 +137,17 @@ app.frame('/check', async (c) => {
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
-    // Replace this with your actual base64 encoded image
-    const base64Image = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKK/Oj+kD/2Q==";
+    // Prewritten message for Farcaster
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(
+      2
+    )} MOX in total! 🚀 Check your own Moxie earnings!`;
 
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today, ${parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX this week, and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
-    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&weeklyEarnings=${userInfo.weeklyEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
+    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
+
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
     return c.res({
-      image: (
-        <div style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${base64Image})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          fontFamily: 'Protest Riot, sans-serif',
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            left: '5%',
-            color: '#FF6B6B',
-            fontSize: '36px',
-            fontWeight: 'bold',
-          }}>
-            {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX
-          </div>
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            left: '40%',
-            color: '#4ECDC4',
-            fontSize: '36px',
-            fontWeight: 'bold',
-          }}>
-            {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX
-          </div>
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            right: '5%',
-            color: '#45B7D1',
-            fontSize: '36px',
-            fontWeight: 'bold',
-          }}>
-            {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX
-          </div>
-        </div>
-      ),
+      image: ('https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo'),
       intents: [
         <Button action="/">Back</Button>,
         <Button.Link href={farcasterShareURL}>Cast This</Button.Link>,
@@ -196,16 +156,18 @@ app.frame('/check', async (c) => {
   } catch (error) {
     return c.res({
       image: (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#f0e6fa',
-          color: 'black',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#f0e6fa',
+            color: 'black',
+          }}
+        >
           <h1 style={{ fontSize: '39px', fontWeight: 'bold' }}>Error fetching data</h1>
           <p style={{ fontSize: '27px' }}>{(error as Error).message}</p>
         </div>
