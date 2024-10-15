@@ -6,6 +6,15 @@ import { neynar } from 'frog/middlewares';
 const AIRSTACK_API_URL = 'https://api.airstack.xyz/gql';
 const AIRSTACK_API_KEY = '12c3d6930c35e4f56a44191b68b84483f'; // Your actual API key
 
+// Function to fetch image and convert to data URI
+async function getImageAsDataUri(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl);
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString('base64');
+  const mimeType = response.headers.get('content-type') || 'image/png';
+  return `data:${mimeType};base64,${base64}`;
+}
+
 export const app = new Frog({
   basePath: '/api',
   imageOptions: {
@@ -146,33 +155,48 @@ app.frame('/check', async (c) => {
 
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
+    
+    // Fetch the image and convert it to a data URI
+    const imageUrl = 'https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo';
+    const dataUri = await getImageAsDataUri(imageUrl);
 
-    // Prewritten message for Farcaster
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(
-      2
-    )} MOX in total! 🚀 Check your own Moxie earnings!`;
-
+    // Create the share text and URL
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
     const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
-
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
     return c.res({
       image: (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#7b2cbf',
-            color: 'white',
-          }}
-        >
-          <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
-          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
-          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+        <div style={{
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          backgroundImage: `url(${dataUri})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          fontFamily: 'Protest Riot, sans-serif',
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            left: '5%',
+            color: '#FF6B6B',
+            fontSize: '36px',
+            fontWeight: 'bold',
+          }}>
+            {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX
+          </div>
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            right: '5%',
+            color: '#45B7D1',
+            fontSize: '36px',
+            fontWeight: 'bold',
+          }}>
+            {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX
+          </div>
         </div>
       ),
       intents: [
