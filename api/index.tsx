@@ -144,6 +144,7 @@ app.frame('/check', async (c) => {
     return c.res({
       image: (
         <div style={{
+          display: 'flex',
           width: '100%',
           height: '100%',
           backgroundImage: 'url(https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo)',
