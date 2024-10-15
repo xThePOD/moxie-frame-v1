@@ -48,6 +48,7 @@ interface AirstackApiResponse {
 interface MoxieUserInfo {
   todayEarnings: string;
   lifetimeEarnings: string;
+  weeklyEarnings: string;
 }
 
 // Fetch Moxie User Info from API
@@ -94,6 +95,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
     return {
       todayEarnings,
       lifetimeEarnings,
+      weeklyEarnings: '0', // Added weeklyEarnings property
     };
   } catch (error) {
     console.error('Error fetching Moxie data:', error);
@@ -138,11 +140,9 @@ app.frame('/check', async (c) => {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
     // Prewritten message for Farcaster
-    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today and ${parseFloat(userInfo.lifetimeEarnings).toFixed(
-      2
-    )} MOX in total! 🚀 Check your own Moxie earnings!`;
+    const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today, ${parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX this week, and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
 
-    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
+    const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&weeklyEarnings=${userInfo.weeklyEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
 
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
@@ -150,18 +150,21 @@ app.frame('/check', async (c) => {
       image: (
         <div
           style={{
+            width: '100%',
+            height: '100%',
+            backgroundImage: 'url(https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo)',
+            backgroundSize: 'cover',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#7b2cbf',
             color: 'white',
+            fontFamily: 'Protest Riot, sans-serif',
           }}
         >
           <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
           <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
+          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Weekly Earnings: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX</p>
           <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
         </div>
       ),
