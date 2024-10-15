@@ -139,33 +139,52 @@ app.frame('/check', async (c) => {
   try {
     const userInfo = await getMoxieUserInfo(fid.toString());
 
-    // Prewritten message for Farcaster
     const shareText = `I've earned ${parseFloat(userInfo.todayEarnings).toFixed(2)} MOX today, ${parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX this week, and ${parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX in total! 🚀 Check your own Moxie earnings!`;
-
     const shareUrl = `https://moxie-frame-v1.vercel.app/api/share?fid=${fid}&todayEarnings=${userInfo.todayEarnings}&weeklyEarnings=${userInfo.weeklyEarnings}&lifetimeEarnings=${userInfo.lifetimeEarnings}`;
-
     const farcasterShareURL = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}&embeds[]=${encodeURIComponent(shareUrl)}`;
 
     return c.res({
       image: (
         <div
           style={{
-            width: '100%',
-            height: '100%',
-            backgroundImage: 'url(https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo)',
-            backgroundSize: 'cover',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            color: 'white',
+            width: '100%',
+            height: '100%',
+            position: 'relative',
             fontFamily: 'Protest Riot, sans-serif',
           }}
         >
-          <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
-          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
-          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Weekly Earnings: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX</p>
-          <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+          <img
+            src="https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo"
+            alt="Moxie Stats Background"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              color: 'white',
+              zIndex: 1,
+            }}
+          >
+            <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Moxie Stats</h1>
+            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today's Earnings: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX</p>
+            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Weekly Earnings: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX</p>
+            <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Lifetime Earnings: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX</p>
+          </div>
         </div>
       ),
       intents: [
