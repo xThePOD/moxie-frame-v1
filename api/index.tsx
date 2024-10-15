@@ -144,22 +144,14 @@ app.frame('/check', async (c) => {
     return c.res({
       image: (
         <div style={{
-          display: 'flex',
           width: '100%',
           height: '100%',
+          backgroundImage: 'url(https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           position: 'relative',
           fontFamily: 'Protest Riot, sans-serif',
         }}>
-          <img
-            src="https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo"
-            alt="Moxie Stats Background"
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
           <div style={{
             position: 'absolute',
             top: '10%',
