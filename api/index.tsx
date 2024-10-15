@@ -168,7 +168,7 @@ app.frame('/check', async (c) => {
             fontSize: '36px',
             fontWeight: 'bold',
           }}>
-            Today: {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX
+            {parseFloat(userInfo.todayEarnings).toFixed(2)} MOX
           </div>
           <div style={{
             position: 'absolute',
@@ -178,7 +178,7 @@ app.frame('/check', async (c) => {
             fontSize: '36px',
             fontWeight: 'bold',
           }}>
-            Weekly: {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX
+            {parseFloat(userInfo.weeklyEarnings).toFixed(2)} MOX
           </div>
           <div style={{
             position: 'absolute',
@@ -188,7 +188,7 @@ app.frame('/check', async (c) => {
             fontSize: '36px',
             fontWeight: 'bold',
           }}>
-            Lifetime: {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX
+            {parseFloat(userInfo.lifetimeEarnings).toFixed(2)} MOX
           </div>
         </div>
       ),
