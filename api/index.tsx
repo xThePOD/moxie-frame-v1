@@ -104,23 +104,7 @@ async function getMoxieUserInfo(fid: string): Promise<MoxieUserInfo> {
 // Home Frame
 app.frame('/', (c) => {
   return c.res({
-    image: (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'black',
-          color: 'white',
-        }}
-      >
-        <h1 style={{ fontSize: '48px', fontWeight: 'bold' }}>MOXIE</h1>
-        <p style={{ fontSize: '27px', fontWeight: 'bold' }}>Check your Moxie earnings</p>
-      </div>
-    ),
+    image: 'https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmSxprHHGYVX8rVYdcF7fu7LSB6TEkRRjhxq7AMRRWVYcu',
     intents: [<Button action="/check">Check Moxie Stats</Button>],
   });
 });
