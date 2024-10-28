@@ -19,23 +19,7 @@ app.frame('/', (c) => {
 // Stats Frame
 app.frame('/check', (c) => {
   return c.res({
-    image: (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#7b2cbf',
-        color: 'white',
-        padding: '20px',
-      }}>
-        <h1 style={{ fontSize: '51px', fontWeight: 'bold', marginBottom: '20px' }}>Your Moxie Stats</h1>
-        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Today: 0.00 MOX</p>
-        <p style={{ fontSize: '39px', fontWeight: 'bold' }}>Total: 0.00 MOX</p>
-      </div>
-    ),
+    image: 'https://amethyst-able-sawfish-36.mypinata.cloud/ipfs/QmcETgAvvydMDHJKpZxUW6ETcK6k7hQmHAq8fRLXLefwfo',
     intents: [
       <Button action="/">Back to Home</Button>
     ]
