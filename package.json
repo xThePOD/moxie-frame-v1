@@ -8,12 +8,12 @@
     "deploy": "vercel"
   },
   "dependencies": {
-    "frog": "latest",
-    "hono": "^4",
-    "node-fetch": "^2.6.11"
+    "dotenv": "^16.0.0",
+    "frog": "^1.0.0",
+    "node-fetch": "^3.2.0"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.6.11",
+    "@types/node-fetch": "^3.0.3",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "vercel": "^32.4.1"
